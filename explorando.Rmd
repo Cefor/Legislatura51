@@ -1,0 +1,62 @@
+---
+title: "Legislatura 51"
+output: html_document
+---
+
+Este documento contém elementos de análise exploratória dos dados de proposições da [51ª Legislatura](http://www.camara.gov.br/internet/arquivosDadosAbertos/proposicoesdalegislatura51.zip) da Câmara dos Deputados.
+
+### Carga do arquivo
+
+```{r}
+suppressPackageStartupMessages(library(jsonlite))
+jsonData <- data.frame(fromJSON("proposicoesdalegislatura51.json"))
+
+# subtrai o prefixo data. do nome das colunas
+names(jsonData) <- sub("data.", "", names(jsonData))
+
+# converte os campos para fatores
+for(i in 1:ncol(jsonData)){
+    jsonData[[i]] <- as.factor(jsonData[[i]])
+}
+str(jsonData)
+```
+
+### Checagem de campos nulos
+
+```{r}
+# verifica o quantitativo de nulos em todas as colunas
+counts <- colSums(is.na(jsonData))[colSums(is.na(jsonData))>0]
+# par(mar = c(5.1, 4.1, 4.1, 2.1))
+par(mar = c(11, 6, 4.1, 2.1))
+barplot(counts, main="Campos com valores nulos", ylab="Frequência",
+        names.arg=names(counts), cex.names=0.6,
+        col = rainbow(20), las=2)
+```
+
+### Análise descritiva
+
+```{r}
+# explorando freq proposições por região
+counts <- table(jsonData$TEX_REGIAO_GEOGRAFICA_AUTOR)
+barplot(counts, main="Proposições por Região - Legislatura 51", xlab="Região", ylab="Frequência",
+        names.arg=levels(jsonData$TEX_REGIAO_GEOGRAFICA_AUTOR), cex.names=0.7,
+        col = rainbow(20))
+
+# explorando freq proposições por tipo de proposicao
+counts <- table(jsonData$DES_TIPO_PROPOSICAO)
+par(mar = c(11, 4, 2, 2.1))
+barplot(counts, main="Proposições por Tipo - Legislatura 51", 
+        ylab="Frequência",
+        names.arg=levels(jsonData$DES_TIPO_PROPOSICAO), cex.names=0.7,
+        col = rainbow(20), las=2)
+
+# explorando freq proposições por UF
+counts <- table(jsonData$NOM_UF)
+par(mar = c(11, 4, 2, 2.1))
+barplot(counts, main="Proposições por UF - Legislatura 51", 
+        ylab="Frequência",
+        names.arg=levels(jsonData$NOM_UF), cex.names=0.7,
+        col = rainbow(20), las=2)
+
+```
+
